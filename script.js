@@ -28,3 +28,8 @@ fetch("https://striveschool-api.herokuapp.com/api/product/", {
     });
   })
   .catch((error) => console.error("Errore nel fetch dei prodotti:", error));
+//backoffice
+document.addEventListener("DOMContentLoaded", () => {
+  const fomr = document.getElementById("product-form");
+});
+//funzione per inviare il prodotto
