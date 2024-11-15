@@ -1,35 +1,72 @@
 const URL = "https://striveschool-api.herokuapp.com/api/product/";
 const token =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM3MjkxZThhZDEyOTAwMTU4NzZjZjkiLCJpYXQiOjE3MzE2NjgyNTUsImV4cCI6MTczMjg3Nzg1NX0.qbUBwCeFSYqNJdQd48GoQ0lhR6uermbnYSqijNCTYXI";
-//ho definito cos'è l'URL e il token per avere un punto di partenza
-//ora farò la mia richiesta get per ottenere i prodotti
-fetch("https://striveschool-api.herokuapp.com/api/product/", {
+
+fetch(URL, {
   headers: {
     Authorization: `Bearer ${token}`
   }
 })
-  .then((response) => response.json()) //converto la risposta in json per riuscire a leggere meglio i dati
+  .then((response) => response.json())
   .then((products) => {
     const productList = document.getElementById("product-list");
     products.forEach((product) => {
       const productCard = document.createElement("div");
-      productCard.classList.add("col-6", "col-md-4", "col-lg-3", "mb-4");
+      productCard.classList.add("col", "d-flex", "h-100", "card-deck");
       productCard.innerHTML = `
-      <div class="card">
-            <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">${product.name}</h5>
-              <p class="card-text">${product.description} <br><span class="text-muted">${product.brand}</p>
-              <p class="card-price">€${product.price}</p>
-              <a href="#" class="btn btn-primary">Aggiungi al carrello</a>
-            </div>
-          </div>`;
+  <div class="card shadow-sm">
+    <img class="card-img-top" src="${product.imageUrl}" alt="${product.name}">
+    <div class="card-body">
+      <h5 class="card-title">${product.name}</h5>
+      <p class="card-text">${product.description}</p>
+      <p class="card-text text-muted">${product.brand}</p>
+      <p class="card-text">€${product.price}</p>
+     <div class="mt-auto">
+        <a href="#" class="btn btn-warning w-100">Aggiungi al carrello</a>
+    </div>
+    </div>
+    </div>
+      `;
       productList.appendChild(productCard);
     });
   })
   .catch((error) => console.error("Errore nel fetch dei prodotti:", error));
-//backoffice
+
+// Back-office: aggiungi un nuovo prodotto
 document.addEventListener("DOMContentLoaded", () => {
-  const fomr = document.getElementById("product-form");
+  const form = document.getElementById("product-form");
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault(); //per prevenire il refresh automatico
+
+    // qui recupero i valori di input dal form
+    const newProduct = {
+      name: document.getElementById("product-name").value,
+      description: document.getElementById("product-description").value,
+      price: parseFloat(document.getElementById("product-price").value),
+      imageUrl: document.getElementById("product-image").value,
+      brand: document.getElementById("product-brand").value
+    };
+
+    // effettuo la chiamata POST per aggiungere un nuovo prodotto
+    fetch(URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(newProduct) // Trasforma l'oggetto JSON in stringa
+    })
+      .then((response) => {
+        if (!response.ok) {
+          alert("Errore nell'aggiunta del prodotto.");
+        } else {
+          alert("Prodotto aggiunto con successo!");
+          form.reset(); // Resetta il form
+        }
+      })
+      .catch((error) => {
+        console.error("Errore:", error);
+      });
+  });
 });
-//funzione per inviare il prodotto
